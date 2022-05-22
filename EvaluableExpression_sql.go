@@ -158,6 +158,8 @@ func (this EvaluableExpression) findNextSQLString(stream *tokenStream, transacti
 	case SEPARATOR:
 		ret = ","
 
+	case FUNCTION:
+		ret = ""
 	default:
 		errorMsg := fmt.Sprintf("Unrecognized query token '%s' of kind '%s'", token.Value, token.Kind)
 		return "", errors.New(errorMsg)
