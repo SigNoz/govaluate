@@ -4,9 +4,8 @@ import (
 	"testing"
 )
 
-/*
-  Serves as a "water test" to give an idea of the general overhead of parsing
-*/
+// Serves as a "water test" to give an idea of the general overhead of parsing
+
 func BenchmarkSingleParse(bench *testing.B) {
 
 	for i := 0; i < bench.N; i++ {
@@ -14,10 +13,8 @@ func BenchmarkSingleParse(bench *testing.B) {
 	}
 }
 
-/*
-  The most common use case, a single variable, modified slightly, compared to a constant.
-  This is the "expected" use case of govaluate.
-*/
+// The most common use case, a single variable, modified slightly, compared to a constant.
+// This is the "expected" use case of govaluate.
 func BenchmarkSimpleParse(bench *testing.B) {
 
 	for i := 0; i < bench.N; i++ {
@@ -25,9 +22,7 @@ func BenchmarkSimpleParse(bench *testing.B) {
 	}
 }
 
-/*
-  Benchmarks all syntax possibilities in one expression.
-*/
+// Benchmarks all syntax possibilities in one expression.
 func BenchmarkFullParse(bench *testing.B) {
 
 	var expression string
@@ -44,9 +39,7 @@ func BenchmarkFullParse(bench *testing.B) {
 	}
 }
 
-/*
-  Benchmarks the bare-minimum evaluation time
-*/
+// Benchmarks the bare-minimum evaluation time
 func BenchmarkEvaluationSingle(bench *testing.B) {
 
 	expression, _ := NewEvaluableExpression("1")
@@ -57,9 +50,7 @@ func BenchmarkEvaluationSingle(bench *testing.B) {
 	}
 }
 
-/*
-  Benchmarks evaluation times of literals (no variables, no modifiers)
-*/
+// Benchmarks evaluation times of literals (no variables, no modifiers)
 func BenchmarkEvaluationNumericLiteral(bench *testing.B) {
 
 	expression, _ := NewEvaluableExpression("(2) > (1)")
@@ -70,9 +61,7 @@ func BenchmarkEvaluationNumericLiteral(bench *testing.B) {
 	}
 }
 
-/*
-  Benchmarks evaluation times of literals with modifiers
-*/
+// Benchmarks evaluation times of literals with modifiers
 func BenchmarkEvaluationLiteralModifiers(bench *testing.B) {
 
 	expression, _ := NewEvaluableExpression("(2) + (2) == (4)")
@@ -96,9 +85,7 @@ func BenchmarkEvaluationParameter(bench *testing.B) {
 	}
 }
 
-/*
-  Benchmarks evaluation times of parameters
-*/
+// Benchmarks evaluation times of parameters
 func BenchmarkEvaluationParameters(bench *testing.B) {
 
 	expression, _ := NewEvaluableExpression("requests_made > requests_succeeded")
@@ -113,9 +100,7 @@ func BenchmarkEvaluationParameters(bench *testing.B) {
 	}
 }
 
-/*
-  Benchmarks evaluation times of parameters + literals with modifiers
-*/
+// Benchmarks evaluation times of parameters + literals with modifiers
 func BenchmarkEvaluationParametersModifiers(bench *testing.B) {
 
 	expression, _ := NewEvaluableExpression("(requests_made * requests_succeeded / 100) >= 90")
@@ -130,12 +115,11 @@ func BenchmarkEvaluationParametersModifiers(bench *testing.B) {
 	}
 }
 
-/*
-  Benchmarks the ludicrously-unlikely worst-case expression,
-  one which uses all features.
-  This is largely a canary benchmark to make sure that any syntax additions don't
-  unnecessarily bloat the evaluation time.
-*/
+// Benchmarks the ludicrously-unlikely worst-case expression,
+// one which uses all features.
+// This is largely a canary benchmark to make sure that any syntax additions don't
+// unnecessarily bloat the evaluation time.
+
 func BenchmarkComplexExpression(bench *testing.B) {
 
 	var expressionString string
@@ -159,12 +143,10 @@ func BenchmarkComplexExpression(bench *testing.B) {
 	}
 }
 
-/*
-  Benchmarks uncompiled parameter regex operators, which are the most expensive of the lot.
-  Note that regex compilation times are unpredictable and wily things. The regex engine has a lot of edge cases
-  and possible performance pitfalls. This test doesn't aim to be comprehensive against all possible regex scenarios,
-  it is primarily concerned with tracking how much longer it takes to compile a regex at evaluation-time than during parse-time.
-*/
+// Benchmarks uncompiled parameter regex operators, which are the most expensive of the lot.
+// Note that regex compilation times are unpredictable and wily things. The regex engine has a lot of edge cases
+// and possible performance pitfalls. This test doesn't aim to be comprehensive against all possible regex scenarios,
+// it is primarily concerned with tracking how much longer it takes to compile a regex at evaluation-time than during parse-time.
 func BenchmarkRegexExpression(bench *testing.B) {
 
 	var expressionString string
@@ -185,11 +167,9 @@ func BenchmarkRegexExpression(bench *testing.B) {
 	}
 }
 
-/*
-	Benchmarks pre-compilable regex patterns. Meant to serve as a sanity check that constant strings used as regex patterns
-	are actually being precompiled.
-	Also demonstrates that (generally) compiling a regex at evaluation-time takes an order of magnitude more time than pre-compiling.
-*/
+// Benchmarks pre-compilable regex patterns. Meant to serve as a sanity check that constant strings used as regex patterns
+// are actually being precompiled.
+// Also demonstrates that (generally) compiling a regex at evaluation-time takes an order of magnitude more time than pre-compiling.
 func BenchmarkConstantRegexExpression(bench *testing.B) {
 
 	expressionString := "(foo !~ '[bB]az') && (bar =~ '[bB]ar')"

@@ -10,16 +10,15 @@ const (
 	EXPERR_NIL_VALUE string = "cannot have a nil value"
 )
 
-/*
-	Contains a single test case for the EvaluableExpression.NewEvaluableExpressionFromTokens() method.
+// Contains a single test case for the EvaluableExpression.NewEvaluableExpressionFromTokens() method.
 
-	These tests, and the ones in `tokenExpressionFailure_test` will be fairly incomplete.
-	Creating an expression from a string and from tokens _must_ both perform the same syntax checks.
-	So all the checks in `parsing_test` will follow the same logic as the ones here.
+// These tests, and the ones in `tokenExpressionFailure_test` will be fairly incomplete.
+// Creating an expression from a string and from tokens _must_ both perform the same syntax checks.
+// So all the checks in `parsing_test` will follow the same logic as the ones here.
 
-	These tests check some corner cases - such as tokens having nil values when they must have something.
-	Cases that cannot occur through the normal parser, but may occur in other parsers.
-*/
+// These tests check some corner cases - such as tokens having nil values when they must have something.
+// Cases that cannot occur through the normal parser, but may occur in other parsers.
+
 type ExpressionTokenSyntaxTest struct {
 	Name     string
 	Input    []ExpressionToken

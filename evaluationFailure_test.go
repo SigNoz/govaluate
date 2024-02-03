@@ -1,8 +1,7 @@
 package govaluate
 
-/*
-  Tests to make sure evaluation fails in the expected ways.
-*/
+// Tests to make sure evaluation fails in the expected ways.
+
 import (
 	"errors"
 	"fmt"
@@ -14,9 +13,8 @@ type DebugStruct struct {
 	x int
 }
 
-/*
-	Represents a test for parsing failures
-*/
+// Represents a test for parsing failures
+
 type EvaluationFailureTest struct {
 	Name       string
 	Input      string
@@ -287,10 +285,8 @@ func TestLogicalOperatorTyping(test *testing.T) {
 	runEvaluationFailureTests(evaluationTests, test)
 }
 
-/*
-	While there is type-safe transitions checked at parse-time, tested in the "parsing_test" and "parsingFailure_test" files,
-	we also need to make sure that we receive type mismatch errors during evaluation.
-*/
+// While there is type-safe transitions checked at parse-time, tested in the "parsing_test" and "parsingFailure_test" files,
+// we also need to make sure that we receive type mismatch errors during evaluation.
 func TestComparatorTyping(test *testing.T) {
 
 	evaluationTests := []EvaluationFailureTest{

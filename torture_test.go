@@ -1,9 +1,8 @@
 package govaluate
 
-/*
-	Courtesy of abrander
-	ref: https://gist.github.com/abrander/fa05ae9b181b48ffe7afb12c961b6e90
-*/
+// Courtesy of abrander
+// ref: https://gist.github.com/abrander/fa05ae9b181b48ffe7afb12c961b6e90
+
 import (
 	"fmt"
 	"math/rand"

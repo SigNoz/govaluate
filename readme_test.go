@@ -1,10 +1,9 @@
 package govaluate
 
-/*
-  Contains test cases for all the expression examples given in the README.
-  While all of the functionality for these cases should be covered in other tests,
-  this is really just a sanity check.
-*/
+// Contains test cases for all the expression examples given in the README.
+// While all of the functionality for these cases should be covered in other tests,
+// this is really just a sanity check.
+
 import (
 	"testing"
 )

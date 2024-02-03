@@ -22,6 +22,7 @@ type stageTypeCheck func(value interface{}) bool
 type stageCombinedTypeCheck func(left interface{}, right interface{}) bool
 
 type evaluationStage struct {
+	token  ExpressionToken
 	symbol OperatorSymbol
 
 	leftStage, rightStage *evaluationStage
@@ -466,10 +467,8 @@ func isFloat64(value interface{}) bool {
 	return false
 }
 
-/*
-	Addition usually means between numbers, but can also mean string concat.
-	String concat needs one (or both) of the sides to be a string.
-*/
+// Addition usually means between numbers, but can also mean string concat.
+// String concat needs one (or both) of the sides to be a string.
 func additionTypeCheck(left interface{}, right interface{}) bool {
 
 	if isFloat64(left) && isFloat64(right) {
@@ -481,10 +480,8 @@ func additionTypeCheck(left interface{}, right interface{}) bool {
 	return true
 }
 
-/*
-	Comparison can either be between numbers, or lexicographic between two strings,
-	but never between the two.
-*/
+// Comparison can either be between numbers, or lexicographic between two strings,
+// but never between the two.
 func comparatorTypeCheck(left interface{}, right interface{}) bool {
 
 	if isFloat64(left) && isFloat64(right) {
@@ -504,10 +501,8 @@ func isArray(value interface{}) bool {
 	return false
 }
 
-/*
-	Converting a boolean to an interface{} requires an allocation.
-	We can use interned bools to avoid this cost.
-*/
+// Converting a boolean to an interface{} requires an allocation.
+// We can use interned bools to avoid this cost.
 func boolIface(b bool) interface{} {
 	if b {
 		return _true

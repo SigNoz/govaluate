@@ -8,9 +8,8 @@ import (
 	"time"
 )
 
-/*
-	Represents a test of expression evaluation
-*/
+// Represents a test of expression evaluation
+
 type EvaluationTest struct {
 	Name       string
 	Input      string
@@ -710,7 +709,7 @@ func TestNoParameterEvaluation(test *testing.T) {
 			Expected: true,
 		},
 		EvaluationTest{
-			
+
 			Name:  "Ternary/Java EL ambiguity",
 			Input: "false ? foo:length()",
 			Functions: map[string]ExpressionFunction{
@@ -1424,9 +1423,8 @@ func TestParameterizedEvaluation(test *testing.T) {
 	runEvaluationTests(evaluationTests, test)
 }
 
-/*
-	Tests the behavior of a nil set of parameters.
-*/
+// Tests the behavior of a nil set of parameters.
+
 func TestNilParameters(test *testing.T) {
 
 	expression, _ := NewEvaluableExpression("true")
@@ -1437,10 +1435,9 @@ func TestNilParameters(test *testing.T) {
 	}
 }
 
-/*
-	Tests functionality related to using functions with a struct method receiver.
-	Created to test #54.
-*/
+// Tests functionality related to using functions with a struct method receiver.
+// Created to test #54.
+
 func TestStructFunctions(test *testing.T) {
 
 	parseFormat := "2006"
@@ -1511,6 +1508,229 @@ func runEvaluationTests(evaluationTests []EvaluationTest, test *testing.T) {
 			test.Logf("Test '%s' failed", evaluationTest.Name)
 			test.Logf("Evaluation result '%v' does not match expected: '%v'", result, evaluationTest.Expected)
 			test.Fail()
+		}
+	}
+}
+
+func TestJoin(t *testing.T) {
+	cases := []struct {
+		name       string
+		expression string
+		keys       map[string]interface{}
+		expected   bool
+		errorMsg   string
+	}{
+		{
+			name:       "identical single key",
+			expression: "A/B",
+			keys: map[string]interface{}{
+				"A": []string{"os.type"},
+				"B": []string{"os.type"},
+			},
+			expected: true,
+			errorMsg: "",
+		},
+		{
+			name:       "identical multiple keys",
+			expression: "A/B",
+			keys: map[string]interface{}{
+				"A": []string{"os.type", "state"},
+				"B": []string{"os.type", "state"},
+			},
+			expected: true,
+			errorMsg: "",
+		},
+		{
+			name:       "subset keys",
+			expression: "A/B",
+			keys: map[string]interface{}{
+				"A": []string{"os.type", "state"},
+				"B": []string{"os.type"},
+			},
+			expected: true,
+			errorMsg: "",
+		},
+		{
+			name:       "subset keys with 4 series",
+			expression: "A/B + C*2 + D",
+			keys: map[string]interface{}{
+				"A": []string{"os.type", "state"},
+				"B": []string{"os.type"},
+				"C": []string{"os.type", "state"},
+				"D": []string{"os.type"},
+			},
+			expected: true,
+			errorMsg: "",
+		},
+		{
+			name:       "disjoint keys",
+			expression: "A/B",
+			keys: map[string]interface{}{
+				"A": []string{"os.type"},
+				"B": []string{"state"},
+			},
+			expected: false,
+			errorMsg: "Group keys must match or be a subset of the other but found left: [os.type], right: [state]",
+		},
+		{
+			name:       "empty keys on right",
+			expression: "A/B",
+			keys: map[string]interface{}{
+				"A": []string{"host.name"},
+				"B": []string{},
+			},
+			expected: true,
+			errorMsg: "",
+		},
+		{
+			name:       "empty keys on left",
+			expression: "A/B",
+			keys: map[string]interface{}{
+				"A": []string{},
+				"B": []string{"host.name"},
+			},
+			expected: true,
+			errorMsg: "",
+		},
+		{
+			name:       "empty keys for multiple series",
+			expression: "1/(B/C) + A - (1/D)",
+			keys: map[string]interface{}{
+				"A": []string{},
+				"B": []string{"host.name"},
+				"C": []string{"host.name"},
+				"D": []string{"host.name"},
+			},
+			expected: true,
+			errorMsg: "",
+		},
+		{
+			name:       "empty keys on both sides",
+			expression: "A/B",
+			keys: map[string]interface{}{
+				"A": []string{},
+				"B": []string{},
+			},
+			expected: true,
+			errorMsg: "",
+		},
+		{
+			name:       "disjoint keys with multiple series",
+			expression: "(A/B) + C",
+			keys: map[string]interface{}{
+				"A": []string{"os.type"},
+				"B": []string{"state"},
+				"C": []string{"os.type", "state"},
+			},
+			expected: false,
+			errorMsg: "Group keys must match or be a subset of the other but found left: [os.type], right: [state]",
+		},
+		{
+			name:       "disjoint keys but can join given the expression leads to matching keys",
+			expression: "(B/C) + A",
+			keys: map[string]interface{}{
+				"A": []string{"os.type"},
+				"B": []string{"state"},
+				"C": []string{"os.type", "state"},
+			},
+			expected: true,
+			errorMsg: "",
+		},
+		{
+			name:       "signle key",
+			expression: "((B+C)/2)/A",
+			keys: map[string]interface{}{
+				"A": []string{"service.name"},
+				"B": []string{"service.name"},
+				"C": []string{"service.name"},
+			},
+			expected: true,
+			errorMsg: "",
+		},
+		{
+			name:       "multiple keys with partial match",
+			expression: "A/B + C",
+			keys: map[string]interface{}{
+				"A": []string{"os.type", "state"},
+				"B": []string{"os.type"},
+				"C": []string{"os.type", "state"},
+			},
+			expected: true,
+			errorMsg: "",
+		},
+		// Nested Expressions with Disjoint Keys
+		{
+			name:       "nested disjoint keys",
+			expression: "A/(B/C)",
+			keys: map[string]interface{}{
+				"A": []string{"os.type"},
+				"B": []string{"state"},
+				"C": []string{"host.name"},
+			},
+			expected: false,
+			errorMsg: "Group keys must match or be a subset of the other but found left: [state], right: [host.name]",
+		},
+		{
+			name:       "nested disjoint keys with multiple series",
+			expression: "A/(B/C) + D",
+			keys: map[string]interface{}{
+				"A": []string{"os.type"},
+				"B": []string{"state"},
+				"C": []string{"host.name"},
+				"D": []string{"os.type", "state"},
+			},
+			expected: false,
+			errorMsg: "Group keys must match or be a subset of the other but found left: [state], right: [host.name]",
+		},
+		// Series Involved in Multiple Operations - A series is used in multiple operations within an expression to test if key checks are consistent across uses.
+		{
+			name:       "series involved in multiple operations",
+			expression: "A/B + A/C",
+			keys: map[string]interface{}{
+				"A": []string{"os.type"},
+				"B": []string{"state"},
+				"C": []string{"state"},
+			},
+			expected: false,
+			errorMsg: "Group keys must match or be a subset of the other but found left: [os.type], right: [state]",
+		},
+		// Use of Parentheses to Influence Evaluation Order - Cases that explicitly test how parentheses in expressions affect joinability based on group keys.
+		{
+			name:       "parentheses influence evaluation order",
+			expression: "A/(B/C) + D",
+			keys: map[string]interface{}{
+				"A": []string{"os.type"},
+				"B": []string{"state"},
+				"C": []string{"state", "os.type"},
+				"D": []string{"os.type"},
+			},
+			expected: true,
+			errorMsg: "",
+		},
+		// Series with Overlapping but Non-Matching Keys - Series have keys that overlap but don't perfectly match or form a subset.
+		{
+			name:       "overlapping but non-matching keys",
+			expression: "A/B",
+			keys: map[string]interface{}{
+				"A": []string{"os.type", "state"},
+				"B": []string{"os.type", "host.name"},
+			},
+			expected: false,
+			errorMsg: "Group keys must match or be a subset of the other but found left: [os.type state], right: [os.type host.name]",
+		},
+	}
+
+	for _, c := range cases {
+		expression, _ := NewEvaluableExpression(c.expression)
+		can, _, err := expression.CanJoin(c.keys)
+		// fmt.Println(can, keys, err)
+
+		if can != c.expected {
+			t.Errorf("Expected %t but got %t for expression %s", c.expected, can, c.expression)
+		}
+
+		if err != nil && err.Error() != c.errorMsg {
+			t.Errorf("Expected error message %s but got %s for expression %s", c.errorMsg, err.Error(), c.expression)
 		}
 	}
 }
